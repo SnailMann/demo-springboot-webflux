@@ -1,9 +1,5 @@
-package com.snailmann.webflux.mvc;
+package com.snailmann.servlet;
 
-import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -17,18 +13,18 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 模拟同步Servlet
  */
-@RestController
-@RequestMapping("/sync")
+@WebServlet(urlPatterns = "/sync/servlet")
 public class SyncServlet extends HttpServlet {
 
     AtomicInteger count = new AtomicInteger(0);
 
 
-    @GetMapping("/servlet")
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         //模拟耗时操作
         doSomeThing(request,response);
+        System.out.println("同步调用执行完毕");
     }
 
     private void doSomeThing(HttpServletRequest request, HttpServletResponse response) {

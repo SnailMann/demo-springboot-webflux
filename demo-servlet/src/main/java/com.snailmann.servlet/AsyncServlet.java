@@ -1,9 +1,5 @@
-package com.snailmann.webflux.mvc;
+package com.snailmann.servlet;
 
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.ServletException;
@@ -21,23 +17,25 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * 模拟异步Servlet
  */
-@RestController
-@RequestMapping("/async")
+@WebServlet(urlPatterns = "/async/servlet", asyncSupported = true)
 public class AsyncServlet extends HttpServlet {
 
     AtomicInteger count = new AtomicInteger(0);
 
-    @Async
-    @GetMapping("/servlet")
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
+
         //开启异步
-        AsyncContext asyncContext = request.getAsyncContext();
+        AsyncContext asyncContext = null;
+        if (request.isAsyncSupported()) {
+            asyncContext = request.startAsync();
+        }
         //使用CompletableFuture来模拟异步,传入的request和resonse是
-        CompletableFuture.runAsync(() -> {
-            doSomeThing(asyncContext, asyncContext.getRequest(), asyncContext.getResponse());
-        });
+        AsyncContext finalAsyncContext = asyncContext;
+        CompletableFuture.runAsync(() ->
+                doSomeThing(finalAsyncContext, finalAsyncContext.getRequest(), finalAsyncContext.getResponse()));
+        System.out.println("异步调用执行完毕");
 
     }
 

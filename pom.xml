@@ -6,7 +6,11 @@
     <groupId>com.snailmann</groupId>
     <artifactId>webflux</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <modules>
+        <module>demo-servlet</module>
+        <module>demo-servlet</module>
+    </modules>
+    <packaging>pom</packaging>
 
     <name>webflux</name>
     <description>Demo project for webflux</description>
