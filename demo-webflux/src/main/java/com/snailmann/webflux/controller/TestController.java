@@ -1,4 +1,4 @@
-package com.snailmann.webflux.mvc;
+package com.snailmann.webflux.controller;
 
 
 import lombok.extern.slf4j.Slf4j;
