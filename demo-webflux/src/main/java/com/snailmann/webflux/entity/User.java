@@ -12,6 +12,9 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document(collection = "user")
 public class User {
 
+    /**
+     * mongodb主键
+     */
     @Id
     private String id;
 

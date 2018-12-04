@@ -15,6 +15,10 @@ import java.util.stream.Collectors;
 @RestController
 public class TestController {
 
+    /**
+     * 旧接口old test end肯定在5s后才输出
+     * @return
+     */
     @GetMapping("/old/test")
     private String oldTest()   {
         log.info("old test begin");
@@ -23,6 +27,10 @@ public class TestController {
         return "result";
     }
 
+    /**
+     * 新接口new test end几乎与begin同时输出，就类似传统中的异步接口
+     * @return
+     */
     @GetMapping("/new/test")
     private Mono<String> newTest()   {
         log.info("new test begin");
