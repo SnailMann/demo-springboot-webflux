@@ -42,15 +42,14 @@
 
 ### 传统@Controller,@RequestMapping VS Router Functions
 
-| before | after | 
-| :------: | :------: | 
-| ServerRequest | Router Functions |
-
 HandlerFunction(输入ServerRequest返回ServerResponse)
+
 -> 
 RouterFunction(请求URL和HandlerFunction对应起来)
+
 ->
-HttpHandler
+HttpHandler(将RouterFunction包装成HttpHandler)
+
 ->
-Server处理
+Server处理(netty或者Servlet3.1+容器)
 

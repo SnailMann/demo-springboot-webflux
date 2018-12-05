@@ -34,8 +34,8 @@ public class ExceptionAdvice {
      * @param e
      * @return
      */
-    @ExceptionHandler(InVaildUserNameExecption.class)
-    public ResponseEntity handleInVaildUserNameExeption(InVaildUserNameExecption e) {
+    @ExceptionHandler(InVaildUserNameException.class)
+    public ResponseEntity handleInVaildUserNameExeption(InVaildUserNameException e) {
         return new ResponseEntity<>(toStr(e), HttpStatus.BAD_REQUEST);
     }
 
@@ -43,7 +43,7 @@ public class ExceptionAdvice {
      * @param execption
      * @return
      */
-    private String toStr(InVaildUserNameExecption execption) {
+    private String toStr(InVaildUserNameException execption) {
         return execption.getFieldName() + "不允许为:" + execption.getFieldValue();
     }
 

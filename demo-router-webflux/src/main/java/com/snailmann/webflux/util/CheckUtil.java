@@ -1,6 +1,8 @@
 package com.snailmann.webflux.util;
 
-import com.snailmann.webflux.exception.advice.InVaildUserNameExecption;
+
+
+import com.snailmann.webflux.advice.InVaildUserNameException;
 
 import java.util.stream.Stream;
 
@@ -16,7 +18,7 @@ public class CheckUtil {
         Stream.of(INVALID_NAMES)
                 .filter(nameStr -> nameStr.equalsIgnoreCase(name))
                 .findAny().ifPresent(s -> {
-            throw new InVaildUserNameExecption("name", name);
+            throw new InVaildUserNameException("name", name);
         });
     }
 
