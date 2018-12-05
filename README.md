@@ -38,3 +38,19 @@
 
 
 2. 异步Servlet是怎么样工作的？
+
+
+### 传统@Controller,@RequestMapping VS Router Functions
+
+| before | after | 
+| :------: | :------: | 
+| ServerRequest | Router Functions |
+
+HandlerFunction(输入ServerRequest返回ServerResponse)
+-> 
+RouterFunction(请求URL和HandlerFunction对应起来)
+->
+HttpHandler
+->
+Server处理
+
