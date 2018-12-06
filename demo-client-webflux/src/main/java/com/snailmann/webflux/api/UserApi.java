@@ -16,11 +16,11 @@ public interface UserApi {
     Mono<User> createUser(@RequestBody User user);
 
     @PutMapping("/{id}")
-    Mono<User> updateUser(@PathVariable String id,@RequestBody User user);
+    Mono<User> updateUser(@RequestBody User user);
 
     @GetMapping("/{id}")
-    Mono<User> getUserById(@PathVariable String id);
+    Mono<User> getUserById(@PathVariable("id") String id);
 
     @DeleteMapping("/{id}")
-    Mono<Void> deleteUserById(@PathVariable String id);
+    Mono<Void> deleteUserById(@PathVariable("id") String id);
 }

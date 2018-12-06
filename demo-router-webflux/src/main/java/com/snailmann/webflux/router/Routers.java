@@ -34,6 +34,7 @@ public class Routers {
                 // 下面的相当于方法上面的 @RequestMapping
                 // 得到所有用户
                 route(  GET("/"), handler::getAllUser)
+                        .andRoute(GET("/{id}"),handler::getById)
                         // 创建用户
                         .andRoute(POST("/").and(accept(MediaType.APPLICATION_JSON_UTF8)),
                                 handler::createUser)

@@ -3,6 +3,7 @@ package com.snailmann.webflux.Handler;
 import com.snailmann.webflux.entity.User;
 import com.snailmann.webflux.repository.UserRepository;
 import com.snailmann.webflux.util.CheckUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.server.ServerRequest;
@@ -16,6 +17,7 @@ import reactor.core.publisher.Mono;
  * 我们不要发布者.subcribe自行消费。而是都交给Spring框架去消费
  */
 @Component
+@Slf4j
 public class UserHandler {
 
     private final UserRepository userRepository;
@@ -37,12 +39,26 @@ public class UserHandler {
     }
 
     /**
+     * 根据id来获取User
+     *
+     * @param request
+     * @return
+     */
+    public Mono<ServerResponse> getById(ServerRequest request){
+        String id = request.pathVariable("id");
+        return ServerResponse.ok()
+                .contentType(MediaType.APPLICATION_JSON_UTF8)
+                .body(userRepository.findById(id),User.class);
+    }
+
+    /**
      * 创建用户
      *
      * @param request
      * @return
      */
     public Mono<ServerResponse> createUser(ServerRequest request) {
+        log.info("Createing User now");
         //userRepository.save方法不支持Mono或Flux参数，所以我们要用saveAll，需要传入发布者publisher
         //而Mono和Flux就是发布者实现了Publisher
         Mono<User> user = request.bodyToMono(User.class);
@@ -53,7 +69,8 @@ public class UserHandler {
             CheckUtil.checkName(u.getName());
             return ServerResponse.ok()
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .body(userRepository.saveAll(user), User.class);
+                    //如果这里使用userRepository.savaAll(user)会抛异常：Only one connection receive subscriber allowed.
+                    .body(userRepository.save(u), User.class);
         });
 
     }

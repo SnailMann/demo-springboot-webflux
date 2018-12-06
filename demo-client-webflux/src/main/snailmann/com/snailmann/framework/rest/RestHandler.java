@@ -6,20 +6,20 @@ import com.snailmann.framework.bean.ServerInfo;
 /**
  * rest请求调用handler
  */
-public class RestHandler {
+public interface RestHandler {
 
     /**
      * 初始化服务器信息
+     *
      * @param serverInfo
      */
-    public void init(ServerInfo serverInfo) {
-    }
+    void init(ServerInfo serverInfo);
 
     /**
      * rest调用，返回接口
+     *
      * @param methodInfo
+     * @return
      */
-    public Object invokeRest(MethodInfo methodInfo) {
-        return null;
-    }
+    Object invokeRest(MethodInfo methodInfo);
 }

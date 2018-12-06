@@ -5,18 +5,15 @@ import com.snailmann.framework.annotation.ApiServer;
 import com.snailmann.framework.bean.MethodInfo;
 import com.snailmann.framework.bean.ServerInfo;
 import com.snailmann.framework.rest.RestHandler;
-import com.sun.org.apache.bcel.internal.generic.IF_ACMPEQ;
+import com.snailmann.framework.rest.WebClientRestHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandle;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.lang.reflect.Proxy;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -35,7 +32,7 @@ public class JDKProxyCreator implements ProxyCreator {
         ServerInfo serverInfo = extractServerInfo(type);
 
         //给每个代理类一个实现
-        RestHandler restHandler = null;
+        RestHandler restHandler = new WebClientRestHandler();
 
         //因为每次额serverInfo都是一样的，所以不需要再下面多次传入，一次搞定
         restHandler.init(serverInfo);
@@ -69,10 +66,13 @@ public class JDKProxyCreator implements ProxyCreator {
         //获得url和请求类型
         extractUrlAndMethod(method, methodInfo);
         //获得参数
-        extractRequestParamAndBody(method,methodInfo,args);
+        extractRequestParamAndBody(method, methodInfo, args);
+        //提取返回信息
+        extractResultInfo(method, methodInfo);
 
         return methodInfo;
     }
+
 
     /**
      * 从注解中获取url信息
@@ -117,14 +117,14 @@ public class JDKProxyCreator implements ProxyCreator {
                 //put请求
             } else if (annotation instanceof PutMapping) {
                 PutMapping putMapping = (PutMapping) annotation;
-                log.info("getMapping value : {}", putMapping.value());
+                log.info("PutMapping value : {}", putMapping.value());
                 methodInfo.setUrl(putMapping.value()[0]);
                 methodInfo.setMethod(HttpMethod.PUT);
 
                 //delete请求
             } else if (annotation instanceof DeleteMapping) {
                 DeleteMapping deleteMapping = (DeleteMapping) annotation;
-                log.info("getMapping value : {}", deleteMapping.value());
+                log.info("DeleteMapping value : {}", deleteMapping.value());
                 methodInfo.setUrl(deleteMapping.value()[0]);
                 methodInfo.setMethod(HttpMethod.DELETE);
             }
@@ -134,11 +134,13 @@ public class JDKProxyCreator implements ProxyCreator {
 
     /**
      * 得到请求的requestParam和requestBody
+     *
      * @param method
      * @param methodInfo
      * @param args
      */
     private void extractRequestParamAndBody(Method method, MethodInfo methodInfo, Object[] args) {
+
         //第二步解析参数注解和方法参数
         Parameter[] parameters = method.getParameters();
 
@@ -159,9 +161,45 @@ public class JDKProxyCreator implements ProxyCreator {
             //2. 看参数是否带有@RequsetBody
             RequestBody requestBody = parameters[i].getAnnotation(RequestBody.class);
             if (requestBody != null) {
-                methodInfo.setBody((Mono<?>) args[i]);
+                methodInfo.setBody(args[i]);
             }
 
         }
     }
+
+    /**
+     * 获得返回值信息，是Flux还是Mono.泛型真实类型是什么
+     *
+     * @param method
+     * @param methodInfo
+     */
+    private void extractResultInfo(Method method, MethodInfo methodInfo) {
+
+        //判断返回类型是flux还是mono
+        //这里使用isAssignableFrom，判断返回类型是否是flux的子类
+        //我们常熟悉的instanceof是判断实例是否是某个的子类
+        boolean isFlux = method.getReturnType().isAssignableFrom(Flux.class);
+
+        //判断返回对象的实际类型
+        Class<?> resultParamType = extractResultParamType(method.getGenericReturnType());
+
+        methodInfo.setResultType(isFlux);
+        methodInfo.setResultParamType(resultParamType);
+
+    }
+
+    /**
+     * 得到泛型类型的实际类型
+     *
+     * @param genericReturnType
+     * @return
+     */
+    private Class<?> extractResultParamType(Type genericReturnType) {
+
+        //获得真实类型
+        Type[] types = ((ParameterizedType)genericReturnType).getActualTypeArguments();
+        //我们这里只有一个泛型参数，所以直接取第一个就可以了
+        return (Class<?>) types[0];
+    }
+
 }

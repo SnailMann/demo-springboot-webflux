@@ -38,5 +38,17 @@ public class MethodInfo {
     /**
      * 请求body
      */
-    private Mono<?> body;
+    private Object body;
+
+
+    /**
+     * 结果类型是Flux还是Mono ,true是flux
+     */
+    private boolean resultType;
+
+
+    /**
+     * 返回对象的类型
+     */
+    private Class<?> resultParamType;
 }
