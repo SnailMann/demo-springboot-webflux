@@ -3,18 +3,10 @@
 - JDK 8
 ### Project Description
 
-- demo-client-webflux 
-
-自定义模拟feigh远程调用框架，实现webflux调用
-- demo-router-webflux 
-
-使用全新的Router Functions风格开发webflux项目
-- demo-tradition-webflux 
-
-使用传统的mvc注解开发webflux项目
-- demo-servlet 
-
-模拟同步servlet和异步servlet
+- `demo-client-webflux `自定义模拟feigh远程调用框架，实现webflux调用
+- `demo-router-webflux `使用全新的Router Functions风格开发webflux项目
+- `demo-tradition-webflux `使用传统的mvc注解开发webflux项目
+- `demo-servlet`模拟同步servlet和异步servlet
 
 
 ### Reactive Stack VS Servlet Stack
