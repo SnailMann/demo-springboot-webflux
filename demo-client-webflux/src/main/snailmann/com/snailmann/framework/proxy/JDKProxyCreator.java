@@ -39,6 +39,7 @@ public class JDKProxyCreator implements ProxyCreator {
         log.info("createProxy - type : {}", type);
         log.info("createProxy - server: {}", serverInfo);
 
+        //最重要的部分：如何帮userApi接口动态生成实现类
         return Proxy.newProxyInstance(this.getClass().getClassLoader(), new Class[]{type}, new InvocationHandler() {
             @Override
             public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
@@ -54,6 +55,7 @@ public class JDKProxyCreator implements ProxyCreator {
     }
 
     /**
+     *
      * 根据方法定义和调用参数得到调用的相关信息
      *
      * @param method
