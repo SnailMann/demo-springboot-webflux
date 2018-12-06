@@ -4,6 +4,7 @@ import com.snailmann.framework.bean.MethodInfo;
 import com.snailmann.framework.bean.ServerInfo;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 public class WebClientRestHandler implements RestHandler {
 
@@ -28,23 +29,35 @@ public class WebClientRestHandler implements RestHandler {
     @Override
     public Object invokeRest(MethodInfo methodInfo) {
 
-        Object result = null;
+        Object result;
 
-        WebClient.ResponseSpec request = this.webClient
+        WebClient.RequestBodySpec request = this.webClient
                 //http方法
                 .method(methodInfo.getMethod())
                 //url
-                .uri(methodInfo.getUrl(),methodInfo.getParams())
+                .uri(methodInfo.getUrl(), methodInfo.getParams())
                 //返回值格式
-                .accept(MediaType.APPLICATION_JSON)
-                //发出请求
-                .retrieve();
+                .accept(MediaType.APPLICATION_JSON);
+        //发出请求
 
-        //处理response的body
-        if (methodInfo.isResultType()){
-            result = request.bodyToFlux(methodInfo.getResultParamType());
+        //判断是否带有body，如果带有body，就要执行body方法再发送
+        WebClient.ResponseSpec retrieve;
+        if (methodInfo.getBody() != null) {
+
+            retrieve = request.body(Mono.just(methodInfo.getBody()), methodInfo.getBodyParamType()).retrieve();
         } else {
-            result = request.bodyToMono(methodInfo.getResultParamType());
+            retrieve = request.retrieve();
+        }
+
+        //处理异常
+        retrieve.onStatus(status -> status.value() == 404,clientResponse -> Mono.just(new RuntimeException("Not Found")));
+
+        //发送之后得到了response
+        //处理response的body
+        if (methodInfo.isResultType()) {
+            result = retrieve.bodyToFlux(methodInfo.getResultParamType());
+        } else {
+            result = retrieve.bodyToMono(methodInfo.getResultParamType());
         }
 
 

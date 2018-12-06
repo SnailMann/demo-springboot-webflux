@@ -16,7 +16,7 @@ public class TestController {
 
 
     @GetMapping("/test")
-    public void test(){
+    public void test() {
         //测试信息提取，不订阅，不会发出实际请求，但会进入我们的代理类
         userApi.getAllUser();
         userApi.getUserById("11111");
@@ -27,29 +27,28 @@ public class TestController {
     @GetMapping("/")
     public void getAll() {
         Flux<User> user = userApi.getAllUser();
-        user.subscribe(System.out::println);
+        user.subscribe(System.out::println, e -> System.out.println("找不到用户: " + e.getMessage()));
 
 
     }
 
     @GetMapping("/{id}")
-    public void get(@PathVariable String id){
-        Mono<User> user =  userApi.getUserById(id);
-        user.subscribe(System.out::println);
+    public void get(@PathVariable String id) {
+        Mono<User> user = userApi.getUserById(id);
+        user.subscribe(System.out::println, e -> System.out.println("找不到用户: " + e.getMessage()));
     }
 
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable String id){
+    public void delete(@PathVariable String id) {
         Mono<Void> response = userApi.deleteUserById(id);
-       response.subscribe(aVoid -> System.out.println(response));
+        response.subscribe(u -> System.out.println("删除成功"), e -> System.out.println("删除失败: " + e.getMessage()));
     }
 
     @PostMapping("/")
-    public void create(@RequestBody User user){
+    public void create(@RequestBody User user) {
         Mono<User> response = userApi.createUser(user);
-        System.out.println(response);
-        response.subscribe(System.out::println);
+        response.subscribe(System.out::println, e -> System.out.println("新增用户不成功：" + e.getMessage()));
 
     }
 

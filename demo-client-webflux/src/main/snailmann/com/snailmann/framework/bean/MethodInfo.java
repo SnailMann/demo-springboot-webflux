@@ -40,6 +40,11 @@ public class MethodInfo {
      */
     private Object body;
 
+    /**
+     * body的实际类型
+     */
+    private Class bodyParamType;
+
 
     /**
      * 结果类型是Flux还是Mono ,true是flux
@@ -50,5 +55,5 @@ public class MethodInfo {
     /**
      * 返回对象的类型
      */
-    private Class<?> resultParamType;
+    private Class resultParamType;
 }

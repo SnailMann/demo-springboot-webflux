@@ -162,6 +162,7 @@ public class JDKProxyCreator implements ProxyCreator {
             RequestBody requestBody = parameters[i].getAnnotation(RequestBody.class);
             if (requestBody != null) {
                 methodInfo.setBody(args[i]);
+                methodInfo.setBodyParamType((Class) parameters[i].getParameterizedType());
             }
 
         }
@@ -181,7 +182,7 @@ public class JDKProxyCreator implements ProxyCreator {
         boolean isFlux = method.getReturnType().isAssignableFrom(Flux.class);
 
         //判断返回对象的实际类型
-        Class<?> resultParamType = extractResultParamType(method.getGenericReturnType());
+        Class<?> resultParamType = extractParamType(method.getGenericReturnType());
 
         methodInfo.setResultType(isFlux);
         methodInfo.setResultParamType(resultParamType);
@@ -191,13 +192,13 @@ public class JDKProxyCreator implements ProxyCreator {
     /**
      * 得到泛型类型的实际类型
      *
-     * @param genericReturnType
+     * @param genericType
      * @return
      */
-    private Class<?> extractResultParamType(Type genericReturnType) {
+    private Class<?> extractParamType(Type genericType) {
 
         //获得真实类型
-        Type[] types = ((ParameterizedType)genericReturnType).getActualTypeArguments();
+        Type[] types = ((ParameterizedType)genericType).getActualTypeArguments();
         //我们这里只有一个泛型参数，所以直接取第一个就可以了
         return (Class<?>) types[0];
     }
