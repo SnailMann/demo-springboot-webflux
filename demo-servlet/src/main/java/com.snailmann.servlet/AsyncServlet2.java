@@ -15,10 +15,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 模拟异步Servlet
+ * 模拟异步Servlet2
  */
-@WebServlet(urlPatterns = "/async/servlet", asyncSupported = true)
-public class AsyncServlet extends HttpServlet {
+@WebServlet(urlPatterns = "/async/servlet/2", asyncSupported = true)
+public class AsyncServlet2 extends HttpServlet {
 
     AtomicInteger count = new AtomicInteger(0);
 
@@ -27,19 +27,22 @@ public class AsyncServlet extends HttpServlet {
 
 
         //开启异步
-        AsyncContext asyncContext = null;
+        final AsyncContext asyncContext;
         if (request.isAsyncSupported()) {
             asyncContext = request.startAsync();
+        } else {
+            asyncContext = null;
         }
-        //使用CompletableFuture来模拟异步,传入的request和resonse是
-        AsyncContext finalAsyncContext = asyncContext;
-        CompletableFuture.runAsync(() ->
-                doSomeThing(finalAsyncContext, finalAsyncContext.getRequest(), finalAsyncContext.getResponse()));
+
+        //这里没有通过completeFuture去实现，而是通过asyncContext.start方法去实现异步
+        asyncContext.start(() -> doSomeThing(request, response));
+        //告诉系统，异步任务已经完成
+        asyncContext.complete();
         System.out.println("异步调用执行完毕");
 
     }
 
-    private void doSomeThing(AsyncContext asyncContext, ServletRequest request, ServletResponse response) {
+    private void doSomeThing(ServletRequest request, ServletResponse response) {
         System.out.println("request:" + request.getClass() + " and reponse" + response.getClass());
         Long startTime = System.currentTimeMillis();
         try {
@@ -48,8 +51,8 @@ public class AsyncServlet extends HttpServlet {
             e.printStackTrace();
         }
         System.out.println("sequence: " + count.incrementAndGet() + " spend :" + (double) (System.currentTimeMillis() - startTime) / 1000 + "s");
-        //异步调用结束,触发完成
-        asyncContext.complete();
+
+
     }
 
     @Override
