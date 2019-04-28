@@ -1,6 +1,8 @@
 # webflux
 
 - JDK 8
+- Spring 5.x
+- Spring Boot 2.x
 
 ## Project
 
